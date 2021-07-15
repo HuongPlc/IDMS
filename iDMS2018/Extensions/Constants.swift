@@ -12,6 +12,8 @@ import Foundation
 struct Constants {
     struct WebView {
         static let urlApp = "http://idms2018.nazzy.vn/Mobile2/login/demo"
+//        static let urlApp = "https://imgbb.com/upload"
+
     }
 
     struct ConfigInfo {

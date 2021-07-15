@@ -11,7 +11,7 @@ import UIKit
 import WebKit
 
 class ViewController: UIViewController, UINavigationControllerDelegate {
-    @IBOutlet var wkWebView: WKWebView!
+    private var wkWebView: WKWebView!
 
     lazy var locationManager: CLLocationManager = {
         let locationManager = CLLocationManager()
@@ -24,7 +24,20 @@ class ViewController: UIViewController, UINavigationControllerDelegate {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         locationManager.startUpdatingLocation()
+
         loadWebView()
+    }
+
+    override func loadView() {
+        super.loadView()
+        let contentController = WKUserContentController()
+        contentController.add(self, name: "callbackHandler")
+        let config = WKWebViewConfiguration()
+        config.userContentController = contentController
+
+        wkWebView = WKWebView(frame: view.bounds, configuration: config)
+        wkWebView.addObserver(self, forKeyPath: #keyPath(WKWebView.title), options: .new, context: nil)
+        view = wkWebView
     }
 
     deinit {
@@ -38,14 +51,21 @@ class ViewController: UIViewController, UINavigationControllerDelegate {
         }
     }
 
-
-
     private func pickImage(usingCamera: Bool) {
         let vc = UIImagePickerController()
         vc.sourceType = usingCamera ? .camera : .photoLibrary
         vc.allowsEditing = true
         vc.delegate = self
         present(vc, animated: true)
+    }
+
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
+        print("fucking js mas m")
+        if keyPath == "title" {
+            if let title = wkWebView.title {
+                print(title)
+            }
+        }
     }
 }
 
@@ -76,5 +96,23 @@ extension ViewController: CLLocationManagerDelegate {
         didFailWithError error: Error
     ) {
         // Handle failure to get a user’s location
+    }
+}
+
+extension ViewController: WKScriptMessageHandler {
+    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+        print("ngon lanh: \(message)")
+    }
+
+    func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+        print("hahahha@@@@@@_______")
+        if let host = navigationAction.request.url?.host {
+            if host == "www.apple.com" {
+                decisionHandler(.allow)
+                return
+            }
+        }
+
+        decisionHandler(.cancel)
     }
 }
