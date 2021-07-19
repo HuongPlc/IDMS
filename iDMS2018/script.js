@@ -1,12 +1,7 @@
-function chooseImg() {
-    try {
-        var element = document.getElementById("lbtLogin");
-        element.addEventListener("click", function() {
-                    varmessageToPost = {'ButtonId':'clickMeButton'};
-                    window.webkit.messageHandlers.haha.postMessage(messageToPost);
-        });
-    } catch(err) {
-            console.log('The native context does not exist yet');
+func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+    print("User message got")
+  print(message.name) // prints nativeProcess string
+    if(message.body is String){
+         print(message.body) // prints the data that is sent from javascript
     }
 }
-

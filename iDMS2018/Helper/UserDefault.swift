@@ -17,22 +17,19 @@ struct ConfigInfoService: Service {
     static let shared = ConfigInfoService()
 
     private init() {
-        
     }
 
     func saveInfo<T>(info: T, forKey: String) where T: Decodable {
-        UserDefaults.standard.set(info, forKey: forKey)
+        if let encodedData = try? NSKeyedArchiver.archivedData(withRootObject: info, requiringSecureCoding: false) {
+            UserDefaults.standard.set(encodedData, forKey: forKey)
+        }
     }
 
     func getInfo<T>(for key: String) -> T? where T: Decodable {
-        guard let value = UserDefaults.standard.value(forKey: key) else {
+        guard let data = UserDefaults.standard.object(forKey: key) as? Data else {
             return nil
         }
 
-        if let value = value as? T {
-            return value
-        }
-
-        return nil
+        return try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(data) as! T
     }
 }

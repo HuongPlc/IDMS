@@ -18,6 +18,9 @@
 		5B8A58F326A0180100341327 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5B8A58F226A0180100341327 /* WebKit.framework */; };
 		5B8A58F526A0180D00341327 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5B8A58F426A0180D00341327 /* MapKit.framework */; };
 		5B8A58F826A0214F00341327 /* UserDefault.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8A58F726A0214F00341327 /* UserDefault.swift */; };
+		5BE51CE626A4168C00237181 /* ConfigViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BE51CE426A4168C00237181 /* ConfigViewController.swift */; };
+		5BE51CE726A4168C00237181 /* ConfigViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5BE51CE526A4168C00237181 /* ConfigViewController.xib */; };
+		5BE51CEA26A41BB400237181 /* ConfigInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BE51CE926A41BB400237181 /* ConfigInfo.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -34,6 +37,9 @@
 		5B8A58F226A0180100341327 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
 		5B8A58F426A0180D00341327 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
 		5B8A58F726A0214F00341327 /* UserDefault.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefault.swift; sourceTree = "<group>"; };
+		5BE51CE426A4168C00237181 /* ConfigViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigViewController.swift; sourceTree = "<group>"; };
+		5BE51CE526A4168C00237181 /* ConfigViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ConfigViewController.xib; sourceTree = "<group>"; };
+		5BE51CE926A41BB400237181 /* ConfigInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigInfo.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -69,6 +75,7 @@
 		5B8A58D726A0148200341327 /* iDMS2018 */ = {
 			isa = PBXGroup;
 			children = (
+				5BE51CE826A41B9F00237181 /* Model */,
 				5B8A58F626A0214500341327 /* Helper */,
 				5B8A58EE26A0167200341327 /* Extensions */,
 				5B8A58D826A0148200341327 /* AppDelegate.swift */,
@@ -78,6 +85,8 @@
 				5B8A58E126A0148400341327 /* Assets.xcassets */,
 				5B8A58E326A0148400341327 /* LaunchScreen.storyboard */,
 				5B8A58E626A0148400341327 /* Info.plist */,
+				5BE51CE426A4168C00237181 /* ConfigViewController.swift */,
+				5BE51CE526A4168C00237181 /* ConfigViewController.xib */,
 			);
 			path = iDMS2018;
 			sourceTree = "<group>";
@@ -106,6 +115,14 @@
 				5B29A33B26A02DF20024EA42 /* Permission.swift */,
 			);
 			path = Helper;
+			sourceTree = "<group>";
+		};
+		5BE51CE826A41B9F00237181 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				5BE51CE926A41BB400237181 /* ConfigInfo.swift */,
+			);
+			path = Model;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -170,6 +187,7 @@
 				3D7158EC26A0877C00EAAD84 /* script.js in Resources */,
 				5B8A58ED26A014EB00341327 /* ViewController.xib in Resources */,
 				5B8A58E226A0148400341327 /* Assets.xcassets in Resources */,
+				5BE51CE726A4168C00237181 /* ConfigViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -180,8 +198,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5BE51CEA26A41BB400237181 /* ConfigInfo.swift in Sources */,
 				5B8A58DD26A0148200341327 /* ViewController.swift in Sources */,
 				5B8A58F826A0214F00341327 /* UserDefault.swift in Sources */,
+				5BE51CE626A4168C00237181 /* ConfigViewController.swift in Sources */,
 				5B8A58F026A0168300341327 /* Constants.swift in Sources */,
 				5B8A58D926A0148200341327 /* AppDelegate.swift in Sources */,
 				5B29A33C26A02DF20024EA42 /* Permission.swift in Sources */,
