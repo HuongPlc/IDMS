@@ -7,13 +7,11 @@
 //
 
 import CoreLocation
-import JavaScriptCore
 import UIKit
 import WebKit
 
 class ViewController: UIViewController, UINavigationControllerDelegate {
     private var wkWebView: WKWebView!
-    var jsContext: JSContext!
     var first: Bool = false
 
     var contentController: WKUserContentController?
@@ -26,22 +24,8 @@ class ViewController: UIViewController, UINavigationControllerDelegate {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view.
-//        locationManager.startUpdatingLocation()
-        locationManager.requestLocation()
-        jsContext = JSContext()
 
         loadWebView()
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 15) {
-            var jsToCode = #"uploadImg("")"#
-
-            var uploadGPS = #"setGPS("21.4/105.43")"#
-            self.wkWebView.evaluateJavaScript(uploadGPS) { _, _ in
-                print("Finished evaluating javascript code")
-            }
-        }
-        locationManager.requestLocation()
     }
 
     private func getAddressFromLatLon(pdblLatitude: String, withLongitude pdblLongitude: String) {
@@ -64,12 +48,6 @@ class ViewController: UIViewController, UINavigationControllerDelegate {
 
             if pm.count > 0 {
                 let pm = placemarks![0]
-                print(pm.country)
-                print(pm.locality)
-                print(pm.subLocality)
-                print(pm.thoroughfare)
-                print(pm.postalCode)
-                print(pm.subThoroughfare)
                 var addressString: String = ""
                 if pm.subLocality != nil {
                     addressString = addressString + pm.subLocality! + " - "
@@ -87,16 +65,14 @@ class ViewController: UIViewController, UINavigationControllerDelegate {
                     addressString = addressString + pm.postalCode! + " - "
                 }
 
-                var uploadGPS = #"setGPS("# + pdblLatitude + "/" + pdblLongitude + "\"" + ")"
-                var setGeo = #"setGeo("# + addressString + "\"" + ")"
+                let uploadGPS = #"setGPS(""# + pdblLatitude + "/" + pdblLongitude + "/" + addressString + "\"" + ")"
+                let setGeo = #"setGeo(""# + pdblLatitude + "/" + pdblLongitude + "/" + addressString + "\"" + ")"
                 print("GPS: \(uploadGPS). \(addressString)")
-                DispatchQueue.main.asyncAfter(deadline: .now() + 30) {
-                    self.wkWebView.evaluateJavaScript(uploadGPS) { _, _ in
-                        print("Finished update GPS")
-                    }
-                    self.wkWebView.evaluateJavaScript(setGeo) { _, _ in
-                        print("Finished update GPS")
-                    }
+                self.wkWebView.evaluateJavaScript(uploadGPS) { _, _ in
+                    print("Finished update GPS")
+                }
+                self.wkWebView.evaluateJavaScript(setGeo) { _, _ in
+                    print("Finished update GPS")
                 }
             }
         })
@@ -105,40 +81,27 @@ class ViewController: UIViewController, UINavigationControllerDelegate {
     override func loadView() {
         super.loadView()
 
-//        guard let scriptPath = Bundle.main.path(forResource: "script", ofType: "js"),
-//            let scriptSource = try? String(contentsOfFile: scriptPath) else {
-//            return
-//        }
-//        let userScript = WKUserScript(source: scriptSource, injectionTime: .atDocumentEnd, forMainFrameOnly: false)
-//        contentController!.addUserScript(userScript)
-//
-
-        let scriptSource = #"document.getElementById("customer-search").addEventListener("click", function() { window.webkit.messageHandlers.haha.postMessage("Hello, world!"); });"#
-        let script = WKUserScript(source: scriptSource, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
+        let source = """
+        window.addEventListener('click', function(e) {
+            window.webkit.messageHandlers.buttonClick.postMessage(JSON.stringify(e.target.id));
+        });
+        """
+        let script = WKUserScript(source: source, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
         contentController?.removeAllUserScripts()
 
         let config = WKWebViewConfiguration()
         contentController = WKUserContentController()
         config.userContentController = contentController!
 
-//        let scriptSource = #"document.getElementById("link1").style.background = `red`; document.getElementById("link1").addEventListener("click", function() { document.getElementById("link1").style.background = `green`; });"#
-//        let scriptSource = #"document.getElementById("link1").addEventListener("click", function() { document.getElementById("link1").style.background = `green`; });"#
-
-//        let scriptSource = #"document.getElementById("customer-search").addEventListener("click", function() { window.webkit.messageHandlers.haha.postMessage("Hello, world!"); });"#
-//        let script = WKUserScript(source: scriptSource, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
         contentController?.addUserScript(script)
-
-        contentController?.add(self, name: "buttonClick")
-
-        if #available(iOS 14, *) {
-            contentController?.add(self, name: "nativeProcess")
-        }
 
         config.userContentController = contentController!
 
         wkWebView = WKWebView(frame: view.bounds, configuration: config)
         wkWebView.navigationDelegate = self
         wkWebView.uiDelegate = self
+        wkWebView.configuration.preferences.javaScriptEnabled = true
+        wkWebView.configuration.userContentController.add(self, name: "buttonClick")
 
         wkWebView.navigationDelegate = self
         view = wkWebView
@@ -166,56 +129,6 @@ class ViewController: UIViewController, UINavigationControllerDelegate {
 }
 
 extension ViewController: WKNavigationDelegate {
-    func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
-        print("ghkjh")
-    }
-
-    func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
-        print("ggg  \(navigationAction.request.url)")
-        decisionHandler(WKNavigationActionPolicy.allow)
-    }
-
-    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-//        let scriptSource = #"document.getElementById("spTitle").addEventListener("change", function() { window.webkit.messageHandlers.titleChange.postMessage("TitleChange"); });"#
-//        let scriptSource2 = #"document.getElementById("spTitle").addEventListener("change", function() { document.getElementById("spTitle").setAttribute('name', 'w1-1'); });"#
-//        wkWebView.evaluateJavaScript(scriptSource2) { (data, error) in
-//            if error != nil {
-//                print("Javascript execuption failed: \(error.debugDescription)")
-//            } else {
-//                print("Add duoc user script \(data)")
-//            }
-//        }
-//        let scriptSource = #"document.getElementsByClassName("goto-showroom")[0].addEventListener("click", function() { window.webkit.messageHandlers.haha.postMessage(goto-showroom"); });"#
-//        webView.evaluateJavaScript(scriptSource) { _, error in
-//            if error != nil {
-//                print("No thing \(error)")
-//            }
-//        }
-
-        if let url = webView.url {
-            if url.absoluteString == "http://idms2018.nazzy.vn/Mobile2/demo" && first {
-//                let scriptSource = #"document.getElementById("customer-search").addEventListener("click", function() { window.webkit.messageHandlers.haha.postMessage("Hello, world!"); });"#
-                let scriptSource = #"document.body.style.background = `red`;"#
-                webView.evaluateJavaScript(scriptSource, completionHandler: nil)
-//                let script = WKUserScript(source: scriptSource, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
-//                contentController?.removeAllUserScripts()
-//                contentController?.addUserScript(script)
-//                contentController?.add(self, name: "haha")
-
-                let urlRequest = URLRequest(url: url)
-                wkWebView.load(urlRequest)
-                wkWebView.allowsBackForwardNavigationGestures = true
-                first.toggle()
-            }
-        }
-
-//        let scriptSource = #"console.log(document.getElementsByClassName("goto-showroom"));"#
-//        webView.evaluateJavaScript(scriptSource) { (status, error) in
-//            if error != nil {
-//                print("No thing \(error)")
-//            }
-//        }
-    }
 }
 
 extension ViewController: WKUIDelegate {
@@ -230,9 +143,14 @@ extension ViewController: UIImagePickerControllerDelegate {
             print("No image found")
             return
         }
-        print("imaeg size \(image.size)")
 
+        let imageData = image.pngData()!
+        let encode = imageData.base64EncodedString()
+        let jsToCode = #"uploadImg(""# + encode + "\"" + ")"
         picker.dismiss(animated: true, completion: nil)
+        self.wkWebView.evaluateJavaScript(jsToCode) { _, _ in
+            print("Finished evaluating javascript code")
+        }
     }
 }
 
@@ -260,21 +178,16 @@ extension ViewController: CLLocationManagerDelegate {
 
 extension ViewController: WKScriptMessageHandler {
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-        print("TitleChange \(message.body)")
-        var jsToCode = #"changeEcho("ngon lanh")"#
-        wkWebView.evaluateJavaScript(jsToCode) { _, _ in
-            print("Finished hahahahahhe")
+
+        let idJson = message.body as! String
+        let startIndex = idJson.index(idJson.startIndex, offsetBy: 0)
+        let endIndex = idJson.index(idJson.endIndex, offsetBy: 0)
+        let id = idJson[startIndex..<endIndex]
+        if id == "\"showroom-camera-shot\"" {
+            pickImage(usingCamera: true)
+        }
+        if id == "\"goto-GPS\"" || id == "\"showroom-refresh-GPS\"" {
+            locationManager.requestLocation()
         }
     }
-
-//    func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
-//        if let host = navigationAction.request.url?.host {
-//            if host == "www.apple.com" {
-//                decisionHandler(.allow)
-//                return
-//            }
-//        }
-//
-//        decisionHandler(.cancel)
-//    }
 }
